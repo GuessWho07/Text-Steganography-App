@@ -1,4 +1,5 @@
 from docx import Document
+from docx.shared import RGBColor
 from math import floor
 
 def covert_string_to_bits(text):
@@ -37,15 +38,58 @@ def calculate_doc_potential(document,depth):
     return potential
 
 def get_modified_color(original_color, stegano_value, number_of_bytes):
-    print(bin(original_color))
-    print(bin(stegano_value))
-    binary_oc = bin(original_color)[2:number_of_bytes+2]
+    # print(bin(original_color))
+    # print(bin(stegano_value))
+    binary_oc = bin(original_color)[2:10-number_of_bytes]
     binary_sv = bin(stegano_value)[2:]
     binary_sv = bin(0)[2:]*(4-len(binary_sv))+binary_sv
-    print("COLORS: ",binary_oc, binary_sv)
+    # print("COLORS: ",binary_oc, binary_sv)
     print("NEW_COLOR: {0}{1}".format(binary_oc,binary_sv))
 
     return binary_oc+binary_sv
+
+def get_modified_color_from_bits(original_color, stegano_value_bits, number_of_bytes):
+    # print(bin(original_color))
+    # print(bin(stegano_value))
+    binary_oc = bin(original_color)[2:10-number_of_bytes]
+    binary_sv = stegano_value_bits
+    binary_sv = bin(0)[2:]*(4-len(binary_sv))+binary_sv
+    # print("COLORS: ",binary_oc, binary_sv)
+    print("NEW_COLOR: {0}{1}".format(binary_oc,binary_sv))
+
+    return binary_oc+binary_sv
+
+def change_space_color(doc_path, new_doc_path):
+    # Load the document
+    doc = Document(doc_path)
+
+    # Define the RGB color for the font
+    new_color = RGBColor(255, 255, 255)  # This is red, you can change it to any RGB value you want
+
+    # Iterate through paragraphs
+    for para in doc.paragraphs:
+        for run in para.runs:
+            # Check if the run contains a space
+            if ' ' in run.text:
+                # Split the run by spaces
+                parts = run.text.split(' ')
+                new_run = para.add_run()  # Create a new run
+                new_run.style = run.style  # Copy the style from the original run
+
+                # Iterate through parts and add them with the new color
+                for part in parts:
+                    if part == '':
+                        new_run.add_text(' ')
+                    else:
+                        new_run.add_text(part)
+                        new_run.font.color.rgb = new_color
+
+                # Remove the original run (optional)
+                para.runs.remove(run)
+
+    # Save the modified document
+    doc.save(new_doc_path)
+
 
 def hide_message(message,document,depth):
     # Zamień message na ciąg bitów
@@ -66,15 +110,46 @@ def hide_message(message,document,depth):
     print(divided_message)
     print(convert_bits_to_string(''.join(divided_message)))
 
-    for i in range(len(divided_message)):
+    spaces_rgbs = []
+    spaces_rgbs.append(get_modified_color(255,depth,4))
+
+    for supergroup in divided_message:
+        R = supergroup[:depth]
+        G = supergroup[depth:2*depth]
+        B = supergroup[2*depth:]
+        print(supergroup,"---->",R,G,B)
+        print('Stegano: ',get_modified_color_from_bits(255,R,depth),get_modified_color_from_bits(255,G,depth),get_modified_color_from_bits(255,B,depth))
+        spaces_rgbs.append(get_modified_color_from_bits(255,R,depth))
+        spaces_rgbs.append(get_modified_color_from_bits(255,G,depth))
+        spaces_rgbs.append(get_modified_color_from_bits(255,B,depth))
         # Weź spację
         # Podziel supergrupę na 3
         # Zmień wartości RGB
-        continue
+
+    print(spaces_rgbs)
+
+    ## ODWRÓC PROCES - DLA TESTÓW
+    print(spaces_rgbs[0][4:])
+    print(int(spaces_rgbs[0][4:],2))
+    dec_depth = int(spaces_rgbs[0][4:],2)
+    spaces_rgbs.pop(0)
+    decoding_string = ""
+    for element in spaces_rgbs:
+        print("ELEMENT:",element)
+        decoding = element[8-depth:]
+        print("DECODING:",decoding)
+        decoding_string += decoding
+
+    print("STREAM:",decoding_string)
+    decoding_list = [decoding_string[i:i+8] for i in range(0, len(decoding_string), 8)]
+    decrypted_message = ""
+    for letter in decoding_list:
+        decrypted_message+=chr(int(letter,2))
+
+    print(decrypted_message)
 
     # Weź spację, weź jej kolor, dodaj do niego tajną wartość / Na razie zakładamy że jest czarna
     # ^^^ Powtórz ile razy trzeba
-    pass
 
 def show_message(document):
     # Weź pierwszą spację, przeczytaj na ilu bitach chowamy wiadomość
