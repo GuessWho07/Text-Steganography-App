@@ -42,7 +42,7 @@ def get_modified_color(original_color, stegano_value, number_of_bytes):
     # print(bin(stegano_value))
     binary_oc = bin(original_color)[2:10-number_of_bytes]
     binary_sv = bin(stegano_value)[2:]
-    binary_sv = bin(0)[2:]*(4-len(binary_sv))+binary_sv
+    binary_sv = bin(0)[2:]*(number_of_bytes-len(binary_sv))+binary_sv
     # print("COLORS: ",binary_oc, binary_sv)
     print("NEW_COLOR: {0}{1}".format(binary_oc,binary_sv))
 
@@ -53,7 +53,7 @@ def get_modified_color_from_bits(original_color, stegano_value_bits, number_of_b
     # print(bin(stegano_value))
     binary_oc = bin(original_color)[2:10-number_of_bytes]
     binary_sv = stegano_value_bits
-    binary_sv = bin(0)[2:]*(4-len(binary_sv))+binary_sv
+    binary_sv = bin(0)[2:]*(number_of_bytes-len(binary_sv))+binary_sv
     # print("COLORS: ",binary_oc, binary_sv)
     print("NEW_COLOR: {0}{1}".format(binary_oc,binary_sv))
 
