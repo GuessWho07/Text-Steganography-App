@@ -159,7 +159,7 @@ def main():
         action = int(input("1 - Hide message in document\n2 - Extract message from document\n Your choice...: "))
         if action == 1:
             full_path = input("Please, provide full PATH to the Document you want to hide message in...\n")
-            full_path="C:\\"+full_path
+            # full_path="C:\\"+full_path
 
             while True:
                 while True:
