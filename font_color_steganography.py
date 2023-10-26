@@ -127,16 +127,20 @@ def hide_message(message,document,depth):
         # Zmień wartości RGB
 
     print(spaces_rgbs)
+    return spaces_rgbs
+    # Weź spację, weź jej kolor, dodaj do niego tajną wartość / Na razie zakładamy że jest czarna
+    # ^^^ Powtórz ile razy trzeba
 
+def show_message(hidden_message_list):
     ## ODWRÓC PROCES - DLA TESTÓW
-    print(spaces_rgbs[0][4:])
-    print(int(spaces_rgbs[0][4:],2))
-    dec_depth = int(spaces_rgbs[0][4:],2)
-    spaces_rgbs.pop(0)
+    print(hidden_message_list[0][4:])
+    print(int(hidden_message_list[0][4:],2))
+    dec_depth = int(hidden_message_list[0][4:],2)
+    hidden_message_list.pop(0)
     decoding_string = ""
-    for element in spaces_rgbs:
+    for element in hidden_message_list:
         print("ELEMENT:",element)
-        decoding = element[8-depth:]
+        decoding = element[8-dec_depth:]
         print("DECODING:",decoding)
         decoding_string += decoding
 
@@ -147,13 +151,7 @@ def hide_message(message,document,depth):
         decrypted_message+=chr(int(letter,2))
 
     print(decrypted_message)
-
-    # Weź spację, weź jej kolor, dodaj do niego tajną wartość / Na razie zakładamy że jest czarna
-    # ^^^ Powtórz ile razy trzeba
-
-def show_message(document):
-    # Weź pierwszą spację, przeczytaj na ilu bitach chowamy wiadomość
-    pass
+    return decrypted_message
 
 def main():
     while True:
@@ -182,7 +180,14 @@ def main():
                 else:
                     break
             
-            hide_message(message,document,depth)
+
+            print("For presentation purposes, now the message will be unveiled...")
+            hidden_message = hide_message(message,document,depth)
+            encrypted_message = show_message(hidden_message)
+
+            print("Original message:",message)
+            print("Hidden message (Each element of the list defines one of RBG components of Space color):",hidden_message)
+            print("Unveiled message:",encrypted_message)
 
         elif action == 2:
             full_path = input("Please, provide full PATH to the Document you want to extract message from...\n")
