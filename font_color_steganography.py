@@ -447,6 +447,7 @@ def show_message_from_file(document_path):
         decrypted_message+=chr(int(letter,2))
 
     print(decrypted_message)
+    return decrypted_message
 
 
 
