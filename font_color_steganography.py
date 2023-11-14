@@ -162,12 +162,13 @@ def check_colors_validity(color_list, paragraph):
             valid_g = color_list[colors_checked][1]
             valid_b = color_list[colors_checked][2]
 
-            print("Got {0}, {1}, {2} | Wanted {3}, {4}, {5}".format(r,g,b,valid_r,valid_g,valid_b))
+            # print("Got {0}, {1}, {2} | Wanted {3}, {4}, {5}".format(r,g,b,valid_r,valid_g,valid_b))
 
             if r == valid_r and g == valid_g and b == valid_b:
-                print ("Color is correct")
+                # print ("Color is correct")
+                errors += 0
             else:
-                print ("Color is incorrect")
+                # print ("Color is incorrect")
                 errors += 1
 
             colors_checked+=1
@@ -190,7 +191,7 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
             elif len(triplet) == 3:
                 break
 
-    print("Final colors list:",colors)
+    # print("Final colors list:",colors)
     color_index = 0  # Initialize color index
 
 
@@ -199,11 +200,11 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
         if to_new == True:
             doc_new.add_paragraph() # Dla każdego paragrafu z oryginalnego dokumentu dodaj paragraf w kopii.
         
-        print("Original runs:", [run.text for run in paragraph.runs])
+        # print("Original runs:", [run.text for run in paragraph.runs])
 
         for run_index,run in enumerate(paragraph.runs):
             runs_list = []
-            print("Run text:",run.text)
+            # print("Run text:",run.text)
             
             # Zapisz styl danego runu
             if to_new == True:
@@ -230,7 +231,7 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
             
             # Podziel dany run na zestaw runów, gdzie każda spacja jest osobnym runem i fragmenty tekstu które dzieli stają się osobnymi runami
             pointer = 0
-            print("Paragraph before rzekome dzielenie:",paragraph.text)
+            # print("Paragraph before rzekome dzielenie:",paragraph.text)
             # for position in space_pos:
             #     runs_list.append(placeholder.add_paragraph().add_run(run_text[pointer:position]))
             #     print("Appended run.text:", runs_list[-1].text)
@@ -242,33 +243,36 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
             # Dodaj do listy ostatni fragment runa
             # runs_list.append(placeholder.add_paragraph().add_run(run_text[pointer:]))
             split_run_text = re.split(r'(\s+)',run_text)
+
+            #TODO: Podziel tekst po spacjach tylko dla tylu spacji ilu potrzeba, inaczej wychodzą krzaczki przy dekodowaniu
+
             split_run_text = [element for element in split_run_text if element != '']
-            print("Split run text: ",split_run_text)
+            # print("Split run text: ",split_run_text)
             for text in split_run_text:
                 runs_list.append(placeholder.add_paragraph().add_run(text))
-                print("Appended run.text:", runs_list[-1].text)
+                # print("Appended run.text:", runs_list[-1].text)
 
-            print("RUN LIST:",[run.text for run in runs_list])
-            print("Paragraph after rzekome dzielenie:",paragraph.text)
+            # print("RUN LIST:",[run.text for run in runs_list])
+            # print("Paragraph after rzekome dzielenie:",paragraph.text)
 
-            print("Runs list:",runs_list)
+            # print("Runs list:",runs_list)
 
-            print("Color: {0} | Text: {1}".format(run_style["color"],run.text))
-            for i, run in enumerate(runs_list):
-                print("ID {0} | Color: {1} | Text: \"{2} \"".format(i,run.font.color.rgb,run.text))
+            # print("Color: {0} | Text: {1}".format(run_style["color"],run.text))
+            # for i, run in enumerate(runs_list):
+            #     print("ID {0} | Color: {1} | Text: \"{2} \"".format(i,run.font.color.rgb,run.text))
 
             # Do paragrafu z nowego doumentu dodaj run utworzony na podstawie tekstu z poprzendiego runu oraz ustaw jego styl na styl oryginału
             if to_new == False:
                 for run_part_index, run_part in enumerate(runs_list):
-                    print("Paragraph before insert:",paragraph.text)
+                    # print("Paragraph before insert:",paragraph.text)
                     # print("RUN WILL BE INSERTED AT POSITION {0}".format(run_part_index+run_index))
                     # paragraph.runs.append(run_part)
                     paragraph.add_run(run_part.text)
                     copy_run_style(run, paragraph.runs[-1])
-                    print("Paragraph after insert:",paragraph.text)
+                    # print("Paragraph after insert:",paragraph.text)
             else:
                 for run_part_index, run_part in enumerate(runs_list):
-                    print("Paragraph before insert:",paragraph.text)
+                    # print("Paragraph before insert:",paragraph.text)
                     doc_new.paragraphs[para_index].add_run(run_part.text)
                     # print_run_style(doc_new.paragraphs[para_index].runs[run_part_index])
                     # copy_run_style(run_part,doc_new.paragraphs[para_index].runs[run_part_index])
@@ -276,29 +280,29 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
                     # paragraph.runs.insert(1+run_part_index,run_part)
 
                     # paragraph.runs.insert(run_index+run_part_index,run_part)
-                    print("Paragraph after insert:",paragraph.text)
+                    # print("Paragraph after insert:",paragraph.text)
 
             # Przeiteruj po runach, jeżeli run jest spacją, ustaw mu odpowiedni kolor
             if to_new == False:
                 for index,run in enumerate(paragraph.runs):
                     if run.text == ' ' and color_index < len(colors):
-                        print("Colors, color_index:",colors,color_index)
+                        # print("Colors, color_index:",colors,color_index)
                         r, g, b = colors[color_index]
                         run.font.color.rgb = RGBColor(r,g,b)
-                        print("RGB: {0},{1},{2} | HEX_TO_RGB {3}".format(r,g,b,hex_to_rgb(str(run.font.color.rgb))))
+                        # print("RGB: {0},{1},{2} | HEX_TO_RGB {3}".format(r,g,b,hex_to_rgb(str(run.font.color.rgb))))
                         color_index += 1
             else:
                 for index,run in enumerate(doc_new.paragraphs[para_index].runs):
                     if run.text == ' ' and color_index < len(colors):
-                        print("Colors, color_index:",colors,color_index)
+                        # print("Colors, color_index:",colors,color_index)
                         r, g, b = colors[color_index]
                         run.font.color.rgb = RGBColor(r,g,b)
-                        print("RGB: {0},{1},{2} | HEX_TO_RGB {3}".format(r,g,b,hex_to_rgb(str(run.font.color.rgb))))
+                        # print("RGB: {0},{1},{2} | HEX_TO_RGB {3}".format(r,g,b,hex_to_rgb(str(run.font.color.rgb))))
                         color_index += 1
 
-        print("First run color",hex_to_rgb(str(paragraph.runs[1].font.color.rgb)))
-        print("Run texts", [run.text for run in runs_list])
-        print("Para texts", [run.text for run in paragraph.runs])
+        # print("First run color",hex_to_rgb(str(paragraph.runs[1].font.color.rgb)))
+        # print("Run texts", [run.text for run in runs_list])
+        # print("Para texts", [run.text for run in paragraph.runs])
 
         # Check if colors set are correct
         color_validity = check_colors_validity(colors,paragraph)
@@ -320,15 +324,33 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
 
     doc_read = Document(new_doc_path)
 
-    for paragraph in doc_read.paragraphs:
-        for run in paragraph.runs:
-            print("Newly opened file: ",run.text)
+    # for paragraph in doc_read.paragraphs:
+    #     for run in paragraph.runs:
+    #         print("Newly opened file: ",run.text)
 
 def hide_message(message,document,depth):
     # Zamień message na ciąg bitów
     message_bytes = covert_string_to_bits(message)
+    message_bytes = [message_bytes[i:i+depth*3] for i in range(0, len(message_bytes),depth*3)]
+    print('MB BEFORE:',message_bytes)
+
+    if len(message_bytes[-1]) == depth*3:
+        print(message_bytes[-1])
+        print(message_bytes[-1][-1])
+        if message_bytes[-1][-1] == '0':
+            message_bytes.append('1' * (depth*3))
+        else:
+            message_bytes.append('0' * (depth*3))
+    else:
+        missing_bytes = (depth*3) - len(message_bytes[-1])
+        if message_bytes[-1][-1] == '0':
+            message_bytes[-1] = message_bytes[-1] + '1' * missing_bytes
+        else:
+            message_bytes[-1] = message_bytes[-1] + '0' * missing_bytes
+
+    print('MB AFTER:',message_bytes)
     # print("Encoded message: ",message_bytes)
-    
+    message_bytes = ''.join(message_bytes)
     # Zakoduj to na ostatnich 4 bitach koloru R pierwszej spacji
     binary_depth = bin(depth)[2:]
     # print(binary_depth)
@@ -365,7 +387,7 @@ def hide_message(message,document,depth):
     spaces_rgbs_dec_triplet = [spaces_rgbs_dec[i:i+3] for i in range(0, len(spaces_rgbs_dec), 3)]
     # print("Spaces RGBs DEC TRIPLET",spaces_rgbs_dec_triplet)
     
-    change_space_color(document,"C:\\Users\paluc\OneDrive\Dokumenty\out.docx",spaces_rgbs_dec_triplet,False)
+    change_space_color(document,"space_color_examples/out.docx",spaces_rgbs_dec_triplet,False)
 
     return spaces_rgbs
     # Weź spację, weź jej kolor, dodaj do niego tajną wartość / Na razie zakładamy że jest czarna
@@ -393,26 +415,48 @@ def show_message(hidden_message_list):
     # print(decrypted_message)
     return decrypted_message
 
+def truncate_binary_string(binary_str):
+    
+    print("TRUNCATE BINARY STRING:",binary_str)
+    last_bit = binary_str[-1]
+    print("LAST BIT:",last_bit)
+
+    # Determine the target bit based on the last bit
+    target_bit = '0' if last_bit == '0' else '1'
+    print("TARGET BIT:",target_bit)
+
+    while True:
+
+        if binary_str[-1] == target_bit:
+            # print("TRUNCATING")
+            binary_str = binary_str[0:len(binary_str)-1]
+        else:
+            break
+    
+    return binary_str
+
 def show_message_from_file(document_path):
     colors = []
+    run_texts = []
     doc = Document(document_path)
     for paragraph in doc.paragraphs:
         for run in paragraph.runs:
             print(run.text)
+            run_texts.append(run.text)
             if run.text == ' ':
                 print(run.font.color.rgb)
                 if run.font.color.rgb != None:
                     colors.append(run.font.color.rgb)
 
-    print("Colors:",colors)
-    print("Translated colors:",[hex_to_rgb(str(color)) for color in colors])
+    # print("Colors:",colors)
+    # print("Translated colors:",[hex_to_rgb(str(color)) for color in colors])
     translated_colors = [hex_to_rgb(str(color)) for color in colors]
 
     # Get depth
     binary_first_color = bin(colors[0][0])[6:]
     print(binary_first_color)
     depth = int(binary_first_color,2)
-    print("Depth:",depth)
+    # print("Depth:",depth)
 
     trans_color_stream = []
     for i, triplet in enumerate(translated_colors):
@@ -438,7 +482,9 @@ def show_message_from_file(document_path):
     for item in binary_color_stream:
         bin_stream += item
 
-    print(bin_stream)
+    print("bin_stream",bin_stream)
+    print("truncated bin stream",truncate_binary_string(bin_stream))
+    bin_stream = truncate_binary_string(bin_stream)
     characters_bin = [bin_stream[i:i+8] for i in range(0, len(bin_stream), 8)]
     print(characters_bin)
 
@@ -446,6 +492,8 @@ def show_message_from_file(document_path):
     for letter in characters_bin:
         decrypted_message+=chr(int(letter,2))
 
+    for i, run in enumerate(run_texts):
+        print("ID: {0} | {1}".format(i,run))
     print(decrypted_message)
     return decrypted_message
 
