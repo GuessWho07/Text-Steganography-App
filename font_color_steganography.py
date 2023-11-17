@@ -155,7 +155,7 @@ def check_colors_validity(color_list, paragraph):
     colors_checked = 0
     errors = 0
     for run in paragraph.runs:
-        print("Checking color of {0}".format(run.text))
+        # print("Checking color of {0}".format(run.text))
         if run.text is ' ' and colors_checked < len(color_list):
             r,g,b = hex_to_rgb(str(run.font.color.rgb))
             valid_r = color_list[colors_checked][0]
@@ -193,7 +193,8 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
 
     # print("Final colors list:",colors)
     color_index = 0  # Initialize color index
-
+    spaces_needed = len(colors)
+    spaces_divided = 0
 
     for para_index, paragraph in enumerate(doc.paragraphs):
         runs_in_para = len(paragraph.runs)
@@ -243,6 +244,21 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
             # Dodaj do listy ostatni fragment runa
             # runs_list.append(placeholder.add_paragraph().add_run(run_text[pointer:]))
             split_run_text = re.split(r'(\s+)',run_text)
+            
+            # print("### NEW SPLIT ###")
+            # print("Run text: {} | Spaces divided: {} | Spaces needed: {}".format(run_text,spaces_divided,spaces_needed))
+            # if spaces_divided < spaces_needed - 1:
+            #     print("Splitting")
+            #     split_run_text = re.split(r'(\s+)',run_text)
+            #     for element in split_run_text:
+            #         if element == ' ':
+            #             spaces_divided += 1
+            #     print("New spaces divided: {}".format(spaces_divided))
+            # else:
+            #     print("Appending as one")
+            #     split_run_text.append(run_text)
+            
+            
 
             #TODO: Podziel tekst po spacjach tylko dla tylu spacji ilu potrzeba, inaczej wychodzą krzaczki przy dekodowaniu
 
@@ -332,11 +348,11 @@ def hide_message(message,document,depth):
     # Zamień message na ciąg bitów
     message_bytes = covert_string_to_bits(message)
     message_bytes = [message_bytes[i:i+depth*3] for i in range(0, len(message_bytes),depth*3)]
-    print('MB BEFORE:',message_bytes)
+    # print('MB BEFORE:',message_bytes)
 
     if len(message_bytes[-1]) == depth*3:
-        print(message_bytes[-1])
-        print(message_bytes[-1][-1])
+        # print(message_bytes[-1])
+        # print(message_bytes[-1][-1])
         if message_bytes[-1][-1] == '0':
             message_bytes.append('1' * (depth*3))
         else:
@@ -348,7 +364,7 @@ def hide_message(message,document,depth):
         else:
             message_bytes[-1] = message_bytes[-1] + '0' * missing_bytes
 
-    print('MB AFTER:',message_bytes)
+    # print('MB AFTER:',message_bytes)
     # print("Encoded message: ",message_bytes)
     message_bytes = ''.join(message_bytes)
     # Zakoduj to na ostatnich 4 bitach koloru R pierwszej spacji
@@ -417,13 +433,13 @@ def show_message(hidden_message_list):
 
 def truncate_binary_string(binary_str):
     
-    print("TRUNCATE BINARY STRING:",binary_str)
+    # print("TRUNCATE BINARY STRING:",binary_str)
     last_bit = binary_str[-1]
-    print("LAST BIT:",last_bit)
+    # print("LAST BIT:",last_bit)
 
     # Determine the target bit based on the last bit
     target_bit = '0' if last_bit == '0' else '1'
-    print("TARGET BIT:",target_bit)
+    # print("TARGET BIT:",target_bit)
 
     while True:
 
@@ -441,10 +457,10 @@ def show_message_from_file(document_path):
     doc = Document(document_path)
     for paragraph in doc.paragraphs:
         for run in paragraph.runs:
-            print(run.text)
+            # print(run.text)
             run_texts.append(run.text)
             if run.text == ' ':
-                print(run.font.color.rgb)
+                # print(run.font.color.rgb)
                 if run.font.color.rgb != None:
                     colors.append(run.font.color.rgb)
 
@@ -454,7 +470,7 @@ def show_message_from_file(document_path):
 
     # Get depth
     binary_first_color = bin(colors[0][0])[6:]
-    print(binary_first_color)
+    # print(binary_first_color)
     depth = int(binary_first_color,2)
     # print("Depth:",depth)
 
@@ -470,31 +486,31 @@ def show_message_from_file(document_path):
 
     binary_color_stream = []
     for color in trans_color_stream:
-        print(bin(color))
+        # print(bin(color))
         if bin(color) != '0b0':
             binary_color_stream.append(bin(color)[10-depth:])
         else:
             binary_zero = '0b00000000'
             binary_color_stream.append(binary_zero[10-depth:])
 
-    print(binary_color_stream)
+    # print(binary_color_stream)
     bin_stream = ""
     for item in binary_color_stream:
         bin_stream += item
 
-    print("bin_stream",bin_stream)
-    print("truncated bin stream",truncate_binary_string(bin_stream))
+    # print("bin_stream",bin_stream)
+    # print("truncated bin stream",truncate_binary_string(bin_stream))
     bin_stream = truncate_binary_string(bin_stream)
     characters_bin = [bin_stream[i:i+8] for i in range(0, len(bin_stream), 8)]
-    print(characters_bin)
+    # print(characters_bin)
 
     decrypted_message = ""
     for letter in characters_bin:
         decrypted_message+=chr(int(letter,2))
 
-    for i, run in enumerate(run_texts):
-        print("ID: {0} | {1}".format(i,run))
-    print(decrypted_message)
+    # for i, run in enumerate(run_texts):
+    #     # print("ID: {0} | {1}".format(i,run))
+    # print(decrypted_message)
     return decrypted_message
 
 
