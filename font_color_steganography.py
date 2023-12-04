@@ -240,16 +240,18 @@ def hide_message(message,document,depth):
     for i in range(0, len(message_bytes),3*depth):
         divided_message.append(message_bytes[i:i+(3*depth)])
 
+    print(divided_message)
+
     spaces_rgbs = []
-    spaces_rgbs.append(get_modified_color(255,depth,4))
+    spaces_rgbs.append(get_modified_color(0,depth,4))
 
     for supergroup in divided_message:
         R = supergroup[:depth]
         G = supergroup[depth:2*depth]
         B = supergroup[2*depth:]
-        spaces_rgbs.append(get_modified_color_from_bits(255,R,depth))
-        spaces_rgbs.append(get_modified_color_from_bits(255,G,depth))
-        spaces_rgbs.append(get_modified_color_from_bits(255,B,depth))
+        spaces_rgbs.append(get_modified_color_from_bits(0,R,depth))
+        spaces_rgbs.append(get_modified_color_from_bits(0,G,depth))
+        spaces_rgbs.append(get_modified_color_from_bits(0,B,depth))
 
     spaces_rgbs_dec = [int(binary, 2) for binary in spaces_rgbs]
     spaces_rgbs_dec_triplet = [spaces_rgbs_dec[i:i+3] for i in range(0, len(spaces_rgbs_dec), 3)]
@@ -297,7 +299,13 @@ def show_message_from_file(document_path):
                     colors.append(run.font.color.rgb)
 
     translated_colors = [hex_to_rgb(str(color)) for color in colors]
-    binary_first_color = bin(colors[0][0])[6:]
+    # print(translated_colors)
+    # print(colors)
+    binary_first_color = format(colors[0][0], '08b')
+    # print("color00",colors[0][0])
+    # print("bincolor00",bin(colors[0][0]))
+    # print("bincolor006",bin(colors[0][0])[6:])
+    print(binary_first_color)
     depth = int(binary_first_color,2)
 
     trans_color_stream = []
@@ -313,7 +321,8 @@ def show_message_from_file(document_path):
     binary_color_stream = []
     for color in trans_color_stream:
         if bin(color) != '0b0':
-            binary_color_stream.append(bin(color)[10-depth:])
+            tempcolor = format(color,'08b')[8-depth:]
+            binary_color_stream.append(tempcolor)
         else:
             binary_zero = '0b00000000'
             binary_color_stream.append(binary_zero[10-depth:])
