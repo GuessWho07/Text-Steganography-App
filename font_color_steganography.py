@@ -45,9 +45,9 @@ def calculate_doc_potential(document,depth):
     return potential
 
 def get_modified_color(original_color, stegano_value, number_of_bytes):
-    binary_oc = bin(original_color)[2:10-number_of_bytes]
-    binary_sv = bin(stegano_value)[2:]
-    binary_sv = bin(0)[2:]*(number_of_bytes-len(binary_sv))+binary_sv
+    binary_oc = format(original_color,"08b")[:8-number_of_bytes]
+    binary_sv = format(stegano_value,"08b")[number_of_bytes:]
+    # binary_sv = bin(0)[2:]*(number_of_bytes-len(binary_sv))+binary_sv
     return binary_oc+binary_sv
 
 def get_modified_color_from_bits(original_color, stegano_value_bits, number_of_bytes):
@@ -220,6 +220,7 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
 def hide_message(message,document,depth):
     message_bytes = covert_string_to_bits(message)
     message_bytes = [message_bytes[i:i+depth*3] for i in range(0, len(message_bytes),depth*3)]
+    print(message_bytes)
 
     if len(message_bytes[-1]) == depth*3:
         if message_bytes[-1][-1] == '0':
@@ -234,6 +235,7 @@ def hide_message(message,document,depth):
             message_bytes[-1] = message_bytes[-1] + '0' * missing_bytes
 
     message_bytes = ''.join(message_bytes)
+    print(message_bytes)
     binary_depth = bin(depth)[2:]
 
     divided_message = []
@@ -256,6 +258,8 @@ def hide_message(message,document,depth):
     spaces_rgbs_dec = [int(binary, 2) for binary in spaces_rgbs]
     spaces_rgbs_dec_triplet = [spaces_rgbs_dec[i:i+3] for i in range(0, len(spaces_rgbs_dec), 3)]
     change_space_color(document,"space_color_examples/out.docx",spaces_rgbs_dec_triplet,False)
+
+    print(spaces_rgbs)
 
     return spaces_rgbs
 
