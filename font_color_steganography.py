@@ -213,11 +213,11 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
                 print("Changed {0} out of {1} colors".format(color_index, len(colors)))
 
 
-        # color_validity = check_colors_validity(colors,paragraph)
-        # if  color_validity == 0:
-        #     print("No colors are invalid")
-        # else:
-        #     print("Some colors are invalid")
+        color_validity = check_colors_validity(colors,paragraph)
+        if  color_validity == 0:
+            print("No colors are invalid")
+        else:
+            print("Some colors are invalid")
 
 
 
