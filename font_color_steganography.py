@@ -149,6 +149,10 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
     spaces_needed = len(colors)
     spaces_divided = 0
 
+    for para in doc.paragraphs:
+        for run in para.runs:
+            print("before run text |{0}|".format(run.text))
+
     for para_index, paragraph in enumerate(doc.paragraphs):
         runs_in_para = len(paragraph.runs)
         if to_new == True:
@@ -174,8 +178,12 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
             split_run_text = re.split(r'(\s+)',run_text)
 
             split_run_text = [element for element in split_run_text if element != '']
+            # print("split run text",split_run_text)
             for text in split_run_text:
                 runs_list.append(placeholder.add_paragraph().add_run(text))
+
+            # for run in runs_list:
+            #     print("Run text |{0}|".format(run.text))
 
             if to_new == False:
                 for run_part_index, run_part in enumerate(runs_list):
@@ -186,29 +194,35 @@ def change_space_color(doc_path, new_doc_path,colors,to_new=False):
                     doc_new.paragraphs[para_index].add_run(run_part.text)
                     set_run_style(doc_new.paragraphs[para_index].runs[run_part_index], run_style)
 
-            if to_new == False:
-                for index,run in enumerate(paragraph.runs):
-                    if run.text == ' ' and color_index < len(colors):
-                        r, g, b = colors[color_index]
-                        run.font.color.rgb = RGBColor(r,g,b)
-                        color_index += 1
-            else:
-                for index,run in enumerate(doc_new.paragraphs[para_index].runs):
-                    if run.text == ' ' and color_index < len(colors):
-                        r, g, b = colors[color_index]
-                        run.font.color.rgb = RGBColor(r,g,b)
-                        color_index += 1
+            print("Runs in para {0}".format(runs_in_para))
+            while runs_in_para != 0:
+                p = paragraph._p
+                print("Removing {0}".format(paragraph.runs[0].text))
+                p.remove(paragraph.runs[0]._r)
+                runs_in_para -= 1
+            print("Runs in para after {0}".format(runs_in_para))
 
-        color_validity = check_colors_validity(colors,paragraph)
-        if  color_validity == 0:
-            print("No colors are invalid")
-        else:
-            print("Some colors are invalid")
 
-        while runs_in_para != 0:
-            p = paragraph._p
-            p.remove(paragraph.runs[runs_in_para-1]._r)
-            runs_in_para -= 1
+        for index,run in enumerate(paragraph.runs):
+            print("run text before change |{0}|".format(run.text))
+            if run.text == ' ' and color_index < len(colors):
+                print("CHANGING")
+                r, g, b = colors[color_index]
+                run.font.color.rgb = RGBColor(r,g,b)
+                color_index += 1
+                print("Changed {0} out of {1} colors".format(color_index, len(colors)))
+
+
+        # color_validity = check_colors_validity(colors,paragraph)
+        # if  color_validity == 0:
+        #     print("No colors are invalid")
+        # else:
+        #     print("Some colors are invalid")
+
+
+
+        for run in paragraph.runs:
+            print("Run after removal |{0}|".format(run.text))
 
     if to_new == True:
         doc_new.save(new_doc_path)
